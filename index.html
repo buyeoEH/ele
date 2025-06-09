@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전기와 물 - 쉬운 비유</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+        .simulation {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        .controls {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        /* 물탱크 */
+        .water-tank {
+            width: 100px;
+            height: 120px;
+            border: 4px solid #2d3436;
+            background: rgba(116, 185, 255, 0.3);
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .water-inside {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #0984e3, #74b9ff);
+            transition: height 0.5s ease;
+            border-radius: 0 0 4px 4px;
+        }
+        .tank-label {
+            text-align: center;
+            font-size: 14px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        /* 파이프 시스템 */
+        .pipe-system {
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+        .pipe-wide {
+            width: 80px;
+            height: 30px;
+            background: #636e72;
+            position: relative;
+            overflow: hidden;
+        }
+        .pipe-narrow {
+            width: 60px;
+            height: 30px;
+            background: #2d3436;
+            position: relative;
+            overflow: hidden;
+            transition: height 0.5s ease, width 0.5s ease;
+        }
+        .water-flow {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 20px;
+            background: linear-gradient(90deg, transparent, #74b9ff, transparent);
+            animation: flowRight 2s linear infinite;
+        }
+        @keyframes flowRight {
+            0% { left: -30px; }
+            100% { left: 100%; }
+        }
+        
+        /* 배터리와 전선 */
+        .battery {
+            width: 80px;
+            height: 50px;
+            background: linear-gradient(45deg, #00b894, #55a3ff);
+            margin: 20px auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .wire {
+            width: 200px;
+            height: 12px;
+            background: #f39c12;
+            margin: 20px auto;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .electrons {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                #f1c40f 0px,
+                #f1c40f 8px,
+                transparent 8px,
+                transparent 16px
+            );
+            animation: electronMove 1.5s linear infinite;
+        }
+        @keyframes electronMove {
+            0% { left: -50px; }
+            100% { left: 100%; }
+        }
+        
+        /* 컨트롤 */
+        .control-group {
+            margin-bottom: 25px;
+        }
+        .control-group h3 {
+            margin: 0 0 15px 0;
+            color: #ffeaa7;
+            font-size: 16px;
+        }
+        .slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ffeaa7;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .value-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffeaa7;
+        }
+        
+        /* 결과 표시 */
+        .results {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .big-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeaa7;
+        }
+        
+        /* 설명 박스 */
+        .explanation {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+        .simple-formula {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #ffeaa7;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .pipe-system {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💧 물과 전기는 똑같아요! ⚡</h1>
+        
+        <div class="main-content">
+            <div class="simulation">
+                <h2 style="text-align: center; margin-bottom: 30px;">🔍 물의 흐름 = 전기의 흐름</h2>
+                
+                <!-- 물탱크 -->
+                <div class="water-tank">
+                    <div class="water-inside" id="waterLevel"></div>
+                </div>
+                <div class="tank-label">💧 물탱크 (전압)</div>
+                <div style="text-align: center; font-size: 16px; margin-bottom: 20px;">
+                    물이 많을수록 → 더 세게 흐름
+                </div>
+                
+                <!-- 파이프 -->
+                <div class="pipe-system">
+                    <div class="pipe-wide">
+                        <div class="water-flow" id="flow1"></div>
+                    </div>
+                    <div class="pipe-narrow" id="narrowPipe">
+                        <div class="water-flow" id="flow2"></div>
+                    </div>
+                    <div class="pipe-wide">
+                        <div class="water-flow" id="flow3"></div>
+                    </div>
+                </div>
+                <div class="tank-label">🚰 파이프 (저항)</div>
+                <div style="text-align: center; font-size: 16px; margin-bottom: 30px;">
+                    좁을수록 → 흐름이 방해됨
+                </div>
+                
+                <!-- 배터리 -->
+                <div class="battery" id="batteryDisplay">9V</div>
+                <div class="tank-label">🔋 배터리 (전압)</div>
+                
+                <!-- 전선 -->
+                <div class="wire">
+                    <div class="electrons" id="electronFlow"></div>
+                </div>
+                <div class="tank-label">⚡ 전선 (전류)</div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <h3>🔋 전압 조절</h3>
+                    <input type="range" class="slider" id="voltageSlider" min="1" max="12" value="9">
+                    <div class="value-box" id="voltageValue">9V</div>
+                    <div style="font-size: 14px; margin-top: 8px;">
+                        물탱크의 높이
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>🚧 저항 조절</h3>
+                    <input type="range" class="slider" id="resistanceSlider" min="1" max="10" value="3">
+                    <div class="value-box" id="resistanceValue">3Ω</div>
+                    <div style="font-size: 14px; margin-top: 8px;">
+                        파이프의 좁기
+                    </div>
+                </div>
+                
+                <div class="results">
+                    <h3 style="margin-top: 0; color: #ffeaa7;">📊 결과</h3>
+                    <div class="result-item">
+                        <span>전류:</span>
+                        <span class="big-number" id="currentValue">3.0A</span>
+                    </div>
+                    <div class="result-item">
+                        <span>전력:</span>
+                        <span class="big-number" id="powerValue">27W</span>
+                    </div>
+                    <div class="simple-formula">
+                        전압 ÷ 저항 = 전류
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <h3>🎯 쉬운 설명</h3>
+            <div style="font-size: 18px; line-height: 1.8;">
+                <p><strong>💧 물탱크 = 🔋 배터리</strong><br>
+                높은 곳에 있는 물이 아래로 떨어지려는 힘 = 배터리에서 전기가 흐르려는 힘</p>
+                
+                <p><strong>🚰 파이프 = ⚡ 전선</strong><br>
+                물이 지나가는 길 = 전기가 지나가는 길</p>
+                
+                <p><strong>🚧 좁은 파이프 = 저항</strong><br>
+                파이프가 좁으면 물이 천천히 흐름 = 저항이 크면 전류가 적게 흐름</p>
+                
+                <div class="simple-formula" style="margin: 20px 0;">
+                    전압이 클수록 → 전류가 많이 흐름<br>
+                    저항이 클수록 → 전류가 적게 흐름
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const voltageSlider = document.getElementById('voltageSlider');
+        const resistanceSlider = document.getElementById('resistanceSlider');
+        const voltageValue = document.getElementById('voltageValue');
+        const resistanceValue = document.getElementById('resistanceValue');
+        const currentValue = document.getElementById('currentValue');
+        const powerValue = document.getElementById('powerValue');
+        const batteryDisplay = document.getElementById('batteryDisplay');
+        const waterLevel = document.getElementById('waterLevel');
+        const narrowPipe = document.getElementById('narrowPipe');
+
+        function updateSimulation() {
+            const voltage = parseFloat(voltageSlider.value);
+            const resistance = parseFloat(resistanceSlider.value);
+            const current = voltage / resistance;
+            const power = voltage * current;
+
+            // 값 표시
+            voltageValue.textContent = voltage + 'V';
+            resistanceValue.textContent = resistance + 'Ω';
+            currentValue.textContent = current.toFixed(1) + 'A';
+            powerValue.textContent = power.toFixed(0) + 'W';
+            batteryDisplay.textContent = voltage + 'V';
+
+            // 물 레벨 (전압에 비례)
+            const waterHeight = (voltage / 12) * 90 + 10;
+            waterLevel.style.height = waterHeight + '%';
+
+            // 파이프 좁기 (저항에 비례)
+            const minHeight = 10;
+            const maxHeight = 30;
+            const pipeHeight = maxHeight - ((resistance - 1) / 9) * (maxHeight - minHeight);
+            narrowPipe.style.height = pipeHeight + 'px';
+
+            // 흐름 속도 (전류에 비례)
+            const baseSpeed = Math.max(0.5, current * 0.4);
+            const flows = ['flow1', 'flow2', 'flow3', 'electronFlow'];
+            flows.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const speed = id === 'electronFlow' ? baseSpeed * 0.8 : baseSpeed;
+                    element.style.animationDuration = (2 / speed) + 's';
+                }
+            });
+
+            // 색상 변화
+            if (current > 2) {
+                waterLevel.style.background = 'linear-gradient(to top, #0984e3, #74b9ff)';
+            } else if (current > 1) {
+                waterLevel.style.background = 'linear-gradient(to top, #6c5ce7, #a29bfe)';
+            } else {
+                waterLevel.style.background = 'linear-gradient(to top, #2d3436, #636e72)';
+            }
+        }
+
+        voltageSlider.addEventListener('input', updateSimulation);
+        resistanceSlider.addEventListener('input', updateSimulation);
+
+        // 초기 설정
+        updateSimulation();
+    </script>
+</body>
+</html>
