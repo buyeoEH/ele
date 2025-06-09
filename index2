@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>간단한 전자회로 설명 (PCB 스타일)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 800px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+        }
+        h2 {
+            font-size: 1.3em;
+            color: #4a5568;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.25rem;
+        }
+        .circuit-diagram-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #10703a; /* PCB 기판 색상 (어두운 초록) */
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 3px solid #064e3b; /* PCB 테두리 */
+        }
+        svg.circuit-diagram {
+            width: 100%;
+            max-width: 550px; /* SVG 최대 너비 증가 */
+            height: auto;
+        }
+        /* SVG 요소 스타일 */
+        .trace { stroke: #fcd34d; stroke-width: 3; fill: none; stroke-linecap: round;} /* 구리 배선 (밝은 노랑/주황) */
+        
+        .battery-footprint { fill: #9ca3af; opacity: 0.7;} /* 배터리 자리 표시 */
+        .battery-body { fill: #d1d5db; stroke: #9ca3af; stroke-width:1; }
+        .battery-positive-cap { fill: #a3a3a3; stroke: #737373; stroke-width:0.5;}
+        .battery-label { font-size: 10px; fill: #e5e7eb; font-weight: bold;} /* PCB 위 글씨는 밝게 */
+
+        .resistor-footprint { fill: #60a5fa; opacity: 0.3; } /* 저항 자리 표시 */
+        .resistor-body { fill: #bfdbfe; stroke: #60a5fa; stroke-width:1; }
+        .resistor-lead-pad { fill: #fcd34d; } /* 저항 다리 연결 패드 */
+        .resistor-band { stroke-width: 3; }
+
+        .led-footprint { fill: #f87171; opacity: 0.3; } /* LED 자리 표시 */
+        .led-case { fill: #fca5a5; opacity:0.8; }
+        .led-dome { fill: #ef4444; }
+        .led-lead-pad { fill: #fcd34d; } /* LED 다리 연결 패드 */
+        .led-light-effect { fill: url(#ledRadialGradient); opacity: 0; animation: blink 1.5s infinite; }
+
+        .component-label { font-size: 12px; font-family: 'Arial', sans-serif; fill: #e5e7eb; text-anchor: middle; } /* PCB 위 글씨는 밝게 */
+        .current-arrow { fill: #fde047; opacity: 0.9; } /* 전류 화살표 색상 (밝은 노랑) */
+        .silk-screen-label { font-size: 9px; fill: #f0fdf4; text-anchor: middle; font-family: 'Courier New', Courier, monospace;} /* PCB 실크스크린 글씨 */
+
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; }
+            30%, 70% { opacity: 0.7; }
+        }
+        
+        .explanation-text p, .explanation-text ul li {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 0.75rem;
+        }
+        .explanation-text strong {
+            color: #1e40af;
+        }
+        .explanation-text ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        .footer-note {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 간단한 전자회로의 구성 💡</h1>
+        <p class="explanation-text">
+            세탁기, 리모컨, 스마트폰 등 우리 주변의 모든 전자제품은 복잡해 보이지만, 사실 기본적인 전자 부품들의 조합으로 이루어져 있습니다. 가장 간단한 형태의 회로를 통해 기본적인 작동 원리를 알아봅시다.
+        </p>
+
+        <h2>기본 회로도 (PCB 스타일)</h2>
+        <div class="circuit-diagram-container">
+            <svg class="circuit-diagram" viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrowhead" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+                        <polygon points="0 0, 7 2.5, 0 5" class="current-arrow" />
+                    </marker>
+                    <radialGradient id="ledRadialGradient" cx="0.5" cy="0.5" r="0.7">
+                        <stop offset="0%" stop-color="#fecaca" stop-opacity="1"/>
+                        <stop offset="100%" stop-color="#f87171" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+
+                <rect x="50" y="150" width="70" height="40" rx="3" class="battery-footprint"/>
+                <text x="85" y="200" class="silk-screen-label">BAT1</text>
+
+                <rect x="160" y="158" width="50" height="24" rx="2" class="resistor-footprint"/>
+                <circle cx="155" cy="170" r="4" class="resistor-lead-pad"/>
+                <circle cx="215" cy="170" r="4" class="resistor-lead-pad"/>
+                <text x="185" y="190" class="silk-screen-label">R1</text>
+
+                <rect x="260" y="155" width="40" height="30" rx="2" class="led-footprint"/>
+                <circle cx="255" cy="170" r="4" class="led-lead-pad"/> <circle cx="305" cy="170" r="4" class="led-lead-pad"/> <text x="280" y="193" class="silk-screen-label">LED1</text>
+                <text x="253" y="152" class="silk-screen-label" style="font-size:7px;">A</text>
+                <text x="307" y="152" class="silk-screen-label" style="font-size:7px;">K</text>
+
+
+                <path d="M120 170 L155 170" class="trace"/> <path d="M215 170 L255 170" class="trace"/> <path d="M305 170 C330 170 340 150 340 120 C340 70 300 50 200 50 L85 50 C60 50 50 70 50 100 L50 150" class="trace"/> <g transform="translate(55, 155)">
+                    <rect x="0" y="0" width="60" height="30" rx="5" class="battery-body"/>
+                    <rect x="58" y="5" width="7" height="20" rx="2" class="battery-positive-cap"/>
+                    <text x="30" y="17" class="battery-label">1.5V</text>
+                </g>
+                <text x="85" y="215" class="component-label">배터리</text>
+                <text x="122" y="148" class="component-label" style="font-size:10px;">+</text>
+                <text x="48" y="148" class="component-label" style="font-size:10px;">-</text>
+
+
+                <g transform="translate(157, 162.5)">
+                     <rect x="0" y="0" width="40" height="15" rx="3" class="resistor-body"/>
+                     <line x1="5" y1="0" x2="5" y2="15" class="resistor-band" stroke="#a16207"/>
+                     <line x1="12" y1="0" x2="12" y2="15" class="resistor-band" stroke="#000000"/>
+                     <line x1="19" y1="0" x2="19" y2="15" class="resistor-band" stroke="#ef4444"/>
+                     <line x1="30" y1="0" x2="30" y2="15" class="resistor-band" stroke="#fbbf24"/>
+                </g>
+                <text x="185" y="205" class="component-label">저항</text>
+
+                <g transform="translate(260, 158)">
+                    <path d="M0 0 L0 24 L16 18 Q20 12 16 6 Z" class="led-case" transform="translate(-5, -4)"/>
+                    <circle cx="10" cy="12" r="8" class="led-dome"/>
+                    <circle cx="10" cy="12" r="15" class="led-light-effect"/>
+                </g>
+                <text x="280" y="208" class="component-label">LED</text>
+
+                <line x1="135" y1="170" x2="145" y2="170" class="trace" marker-end="url(#arrowhead)"/>
+                <line x1="235" y1="170" x2="245" y2="170" class="trace" marker-end="url(#arrowhead)"/>
+                <line x1="120" y1="50" x2="110" y2="50" class="trace" marker-end="url(#arrowhead)"/>
+                <text x="185" y="35" class="component-label" style="font-size:10px; fill: #fde047;">전류의 방향 (+ → -)</text>
+            </svg>
+        </div>
+
+        <h2>각 부품의 역할</h2>
+        <div class="explanation-text">
+            <ul>
+                <li><strong>🔋 배터리 (Battery):</strong> 회로에 전기를 공급하는 '에너지원'입니다. 화학 에너지를 전기 에너지로 변환하여 전압을 만들어내고, 이 전압으로 인해 전기가 흐르게 됩니다. (+극과 -극이 있습니다.)</li>
+                <li><strong>🔗 트레이스 (Trace, 전선 역할):</strong> PCB 기판 위에서 전기가 흐르는 '구리 길'입니다. 각 부품의 다리가 이 트레이스에 연결(납땜)되어 회로를 구성합니다.</li>
+                <li><strong>💡 LED (Light Emitting Diode):</strong> 빛을 내는 반도체 부품입니다. 전류가 흐르면 빛을 발생시키며, 일반 전구보다 에너지 효율이 높고 수명이 깁니다. (+극(Anode)과 -극(Cathode)이 있어 방향을 맞게 연결해야 합니다.)</li>
+                <li><strong>🚧 저항 (Resistor):</strong> 전류의 흐름을 '방해'하거나 '조절'하는 부품입니다. LED와 같이 민감한 부품에 너무 많은 전류가 흘러 손상되는 것을 막아주거나, 회로 전체의 전류량을 원하는 만큼으로 조절하는 역할을 합니다. (그림의 색띠는 실제 저항값을 나타내기도 합니다.)</li>
+            </ul>
+        </div>
+
+        <h2>우리 생활 속 회로</h2>
+        <div class="explanation-text">
+            <p>
+                위에 그려진 회로는 실제 전자제품의 PCB(인쇄 회로 기판) 모습을 매우 단순화하여 표현한 것입니다.
+                실제 PCB에는 더 많은 종류의 부품들이 훨씬 촘촘하게 배치되고, 여러 층의 복잡한 트레이스로 연결되어 다양한 기능을 수행합니다.
+                하지만 기본적인 원리는 이처럼 전기를 공급하고(배터리), 길이 이어져(트레이스), 특정 부품이 작동(LED, 저항 등)하는 것입니다.
+            </p>
+        </div>
+
+        <p class="footer-note">
+            이 자료는 전자회로의 기본적인 이해를 돕기 위해 단순화되었습니다.
+        </p>
+    </div>
+    <script>
+        // 스크립트는 현재 CSS 애니메이션으로 충분하므로 비워둡니다.
+    </script>
+</body>
+</html>
